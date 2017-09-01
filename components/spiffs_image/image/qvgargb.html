@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ESP Camera</title>
+<meta name="viewport" content="width=device-width">
+<style>
+</style>
+</head>
+<body>
+
+
+<p id="feedback">Loading QVGA RGB565 image ...</p>
+
+<canvas id="myCanvas" width="320" height="240"
+style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+<script type="text/javascript">
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
+var canvasData = ctx.createImageData(canvas.width, canvas.height);
+ 
+var oReq = new XMLHttpRequest();
+oReq.open("GET", "/image", true);
+oReq.responseType = "arraybuffer";
+
+oReq.onload = function (oEvent) {
+  var arrayBuffer = oReq.response; // Note: not oReq.responseText
+  if (arrayBuffer) {
+    var byteArray = new Uint8Array(arrayBuffer);
+	console.log(byteArray.byteLength);
+	//debugger;
+	//document.getElementById("demo").innerHTML = byteArray.byteLength;	
+	// assumes QVGA RGB565 format, (320*2) * 240 bytes
+	for (var x = 0; x < canvasData.width; x++) {
+		for (var y = 0; y < canvasData.height; y++) {
+			var bi = y*canvasData.width*2 + x*2;
+			var byte12 = (byteArray[bi] << 8) | byteArray[bi+1];
+			var idx = (x + y * canvas.width) * 4;	
+			var r = byte12 >> 11;
+			var g = (byte12 >> 5) & 0x3f;
+			var b = byte12 & 0x1f;
+			r *= 8;
+			g *= 4;
+			b *= 8;
+			canvasData.data[idx + 0] = r;
+			canvasData.data[idx + 1] = g;
+			canvasData.data[idx + 2] = b;
+			canvasData.data[idx + 3] = 255;
+			}
+		}
+	ctx.putImageData(canvasData, 0, 0);
+	}
+};
+
+oReq.send(null); 
+
+</script>
+</body>
+</html>

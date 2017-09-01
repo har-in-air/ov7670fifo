@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>ESP Camera</title>
+<meta name="viewport" content="width=device-width">
+<style>
+</style>
+</head>
+<body>
+
+<p id="feedback">Trigger frame capture</p>
+
+<canvas id="myCanvas" width="320" height="240"
+style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+<script type="text/javascript">
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
+var canvasData = ctx.createImageData(canvas.width, canvas.height);
+
+ 
+function yuv2red(y, u, v) {
+    var red = y + 1.408* (v - 128);         
+	if (red < 0) red = 0; else
+	if (red > 255) red = 255;
+	return red;
+	}
+function yuv2grn(y, u, v) {
+    var grn = y - 0.345*(u - 128)  - 0.717*(v - 128);        
+	if (grn < 0)	grn = 0; else
+	if (grn > 255) grn = 255;
+	return grn;
+	}
+function yuv2blu(y, u, v) {
+    var blu = y + 1.779*(u - 128);        
+	if (blu < 0)	blu = 0; else
+	if (blu > 255) blu = 255;
+	return blu;
+	}
+
+var timeinterval = setInterval(function(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	document.getElementById("feedback").innerHTML = "Trigger frame capture";
+	var oReq = new XMLHttpRequest();
+	oReq.open("GET", "/image", true);
+	oReq.responseType = "arraybuffer";
+
+	oReq.onload = function (oEvent) {
+	document.getElementById("feedback").innerHTML = "Received frame";
+	var arrayBuffer = oReq.response; // Note: not oReq.responseText
+	if (arrayBuffer) {
+		var byteArray = new Uint8Array(arrayBuffer);
+		console.log(byteArray.byteLength);
+		//debugger;
+		//document.getElementById("feedback").innerHTML = byteArray.byteLength;	
+		// assumes QVGA YUV format, (320*2) * 240 bytes	
+		for (var y = 0; y < canvasData.height; y++) {
+			for (var xx = 0; xx < canvasData.width*2; xx += 4) {
+				var bi = y*canvasData.width*2 + xx;
+				var y0 = byteArray[bi];
+				var u =  byteArray[bi+1];
+				var y1 = byteArray[bi+2];
+				var v =  byteArray[bi+3];
+				var red = yuv2red(y0,u,v);
+				var grn = yuv2grn(y0,u,v);
+				var blu = yuv2blu(y0,u,v);
+				var idx = (xx/2 + y * canvas.width) * 4;	
+				canvasData.data[idx + 0] = red;
+				canvasData.data[idx + 1] = grn;
+				canvasData.data[idx + 2] = blu;
+				canvasData.data[idx + 3] = 255;
+				red = yuv2red(y1,u,v);
+				grn = yuv2grn(y1,u,v);
+				blu = yuv2blu(y1,u,v);			
+				canvasData.data[idx + 4] = red;
+				canvasData.data[idx + 5] = grn;
+				canvasData.data[idx + 6] = blu;
+				canvasData.data[idx + 7] = 255;
+				}
+			}
+		ctx.putImageData(canvasData, 0, 0);
+		}
+	};
+
+	oReq.send(null); 
+	
+}, 10000);	
+
+</script>
+</body>
+</html>
