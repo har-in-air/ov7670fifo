@@ -35,6 +35,9 @@ Example usage : 'python camview_qvgayuv.py com7 230400'
 
 Comment out #define CAMERA_DEBUG to run in normal webserver mode. The LED connected to ESP32 pin 21 will flash everytime a new camera frame is captured by the browser.
 
+### Issues
+
 I was not able to get this working with ESP32 clock frequencies higher than 80MHz, despite slowing the i2c clock and slowing the fifo pixel readout clock. Probably something to do with the wiring. My ESP32 module is soldered to an adapter board connected to an intermediate adapter board connected to the OV7670. I have seen references to problems seen with OV7670 wiring - noise or no picture at all with longer interface wires, maybe the sub-optimal wiring is the issue.
 
+I have only been able to get QVGA (320x240) YUV and RGB565 image capture setup working. No luck so far with VGA resolution.
 
