@@ -24,7 +24,7 @@ it appears I have a module set up for a negative VSYNC. And it has a 12MHz oscil
 
 There are lots of examples of code on the net with OV7670 register setups (it's mostly undocumented registers :-( ). I was only able to get QVGA YUV and RGB565 images working - no luck with VGA. Maybe something to do with the peculiarities of this particular module's schematic and clock frequency.
 
-#### How to build
+### How to build
 Execute 'make menuconfig' and set serial flasher com port and baudrate. In OV7670fifo Configuration, set your existing wifi access point SSID name and password. If you are planning to use the esp32 camera as an AP, this is not required. In ESP32 settings, set the clock frequency to 80MHz. 
 
 Execute 'make flashfs' to build and flash the SPIFFS image containing the javascript html pages. The html web pages are in the
