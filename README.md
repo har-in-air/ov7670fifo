@@ -27,7 +27,8 @@ There are lots of examples of code on the net with OV7670 register setups (it's 
 #### How to build
 Execute 'make menuconfig' and set serial flasher com port and baudrate. Set your existing wifi access point SSID name and password. If you are planning to use the esp32 camera as an AP, this is not required.
 
-Execute 'make flashfs' to build and flash the SPIFFS image containing the javascript html pages. This needs to be done only once, unless you decide to modify the javascript code to do something different - e.g. display monochrome images, do edge detection etc. 
+Execute 'make flashfs' to build and flash the SPIFFS image containing the javascript html pages. The html web pages are in the
+/components/spiffs_image/image sub-directory. This needs to be done only once, unless you decide to modify the javascript code to do something different - e.g. display monochrome images, do edge detection etc. 
 
 Execute 'make flash monitor' to build and flash the application code. You can verify the camera initialization and station/access point initialization on the serial debug monitor terminal. The console baudrate is set up as 230400 baud to speedup transmitting of camera frames over the serial port when checking for correct OV7670 register setup. Uncomment #define CAMERA_DEBUG in main.c for this purpose. You will find appropriate python scripts in the toplevel directory for debugging. 
 Example usage : 'python camview_qvgayuv.py com7 230400'
