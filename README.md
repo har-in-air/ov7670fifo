@@ -20,12 +20,12 @@ Referring to
 
 http://wiki.beyondlogic.org/index.php/OV7670_Camera_Module_with_AL422_FIFO_Theory_of_Operation
 
-it appears I have a module set up for a negative VSYNC. And it has a 12MHz oscillator for the OV7670 pixel clock. So it appears to be different than the common examples I've seen. Maybe that was why it was so much cheaper (~ $10) ! Anyways, for this module you need to ground the PWDN and OE pins, connect WRST to VSYNC, pullup RST to 3V3 with a resistor (I used 22K) and pullup SCL/SDA pins to 3v3 (I used 4.7K). The STR pin is unconnected. You can find the pin connections to the ESP32 in OV7670.h. I used only pin #s lower than 32 to optimize the set and clear gpio pin functions. 
+I have a module set up for a negative VSYNC, though in my case, the fifo WRST pin is on the interface connector and has to be connected to VSYNC. And it has a 12MHz oscillator for the OV7670 pixel clock. So it appears to be different than the common examples I've seen. Maybe that was why it was so much cheaper (~ $10) ! Anyways, for this module you need to ground the PWDN and OE pins, connect WRST to VSYNC, pullup RST to 3V3 with a resistor (I used 22K) and pullup SCL/SDA pins to 3v3 (I used 4.7K). The STR pin is unconnected. You can find the pin connections to the ESP32 in OV7670.h. I used only pin #s lower than 32 to optimize the set and clear gpio pin functions. 
 
 There are lots of examples of code on the net with OV7670 register setups (it's mostly undocumented registers :-( ). I was only able to get QVGA YUV and RGB565 images working - no luck with VGA. Maybe something to do with the peculiarities of this particular module's schematic and clock frequency.
 
 ### How to build
-Execute 'make menuconfig' and set serial flasher com port and baudrate. In OV7670fifo Configuration, set your existing wifi access point SSID name and password. If you are planning to use the esp32 camera as an AP, this is not required. In ESP32 settings, set the clock frequency to 80MHz. 
+Execute 'make menuconfig' and set serial flasher com port and baudrate. In OV7670fifo Configuration, set your existing wifi access point SSID name and password. If you are planning to use the esp32 camera as an AP, this is not required. 
 
 Execute 'make flashfs' to build and flash the SPIFFS image containing the javascript html pages. The html web pages are in the
 /components/spiffs_image/image sub-directory. This needs to be done only once, unless you decide to modify the javascript code to do something different - e.g. display monochrome images, do edge detection etc. 
@@ -36,8 +36,6 @@ Example usage : 'python camview_qvgayuv.py com7 230400'
 Comment out #define CAMERA_DEBUG to run in normal webserver mode. The LED connected to ESP32 pin 21 will flash everytime a new camera frame is captured by the browser.
 
 ### Issues
-
-I was not able to get this working with ESP32 clock frequencies higher than 80MHz, despite slowing the i2c clock and slowing the fifo pixel readout clock. Probably something to do with the wiring. My ESP32 module is soldered to an adapter board connected to an intermediate adapter board connected to the OV7670. I have seen references to problems seen with OV7670 wiring - noise or no picture at all with longer interface wires, maybe the sub-optimal wiring is the issue.
 
 I have only been able to get QVGA (320x240) YUV and RGB565 image capture setup working. No luck so far with VGA resolution.
 
