@@ -37,6 +37,7 @@ static void OV7670_setupPins() {
 	FIFO_RCK_1;
 
 	pinMode(pinVSYNC, INPUT);			
+/*
 	pinMode(pinD0, INPUT_PULLUP);
 	pinMode(pinD1, INPUT_PULLUP);
 	pinMode(pinD2, INPUT_PULLUP);
@@ -45,6 +46,15 @@ static void OV7670_setupPins() {
 	pinMode(pinD5, INPUT_PULLUP);
 	pinMode(pinD6, INPUT_PULLUP);
 	pinMode(pinD7, INPUT_PULLUP);
+*/
+	pinMode(pinD0, INPUT);
+	pinMode(pinD1, INPUT);
+	pinMode(pinD2, INPUT);
+	pinMode(pinD3, INPUT);
+	pinMode(pinD4, INPUT);
+	pinMode(pinD5, INPUT);
+	pinMode(pinD6, INPUT);
+	pinMode(pinD7, INPUT);
   
     ESP_LOGD(TAG, "Initializing SSCB");
     SCCB_Init(pinSDA, pinSCL);
@@ -133,6 +143,7 @@ int OV7670_init_QVGA_YUV(void){
   SCCB_Write(i2cSlaveAddr, REG_COM7, 0x80); // reset to defaults
   delay(100);
   OV7670_writeRegList(qvgayuv_regs);
+ // SCCB_Write(i2cSlaveAddr, REG_COM7, 0x00); 
   //SCCB_Write(OV7670_I2C_ADDR, 0x70, 0xf0);// test bars
   //delay(1);
   //SCCB_Write(OV7670_I2C_ADDR, 0x71, 0xf0);// test bars  
@@ -210,6 +221,7 @@ void OV7670_readLineMono(void) {
 	if (FIFO_D7SET) val |= 0x80;	
     if (!(n & 1)) *p++ = val;
     FIFO_RCK_1;
+	
     }
   }  
 
@@ -218,30 +230,30 @@ void OV7670_readLineMono(void) {
 void OV7670_captureFrame(void){
   while (CAM_VSYNCSET);     // wait for an old frame to end
   while (!CAM_VSYNCSET);    // wait for a new frame to start
+  NOP();NOP(); // fifo wrst is connected to vsync, need delay between wrst  and wren
   FIFO_WR_1;               // enable writing to fifo
   while (CAM_VSYNCSET);     // wait for the current frame to end
   FIFO_WR_0;              // disable writing to fifo
-  delayNOPs(150);
-  FIFO_RRST_1;
+  delayNOPs(200);
   }
 
 
- 
+
+
 // Reset the AL422 fifo read pointer to beginning of image
 void OV7670_rrst(void){
   FIFO_RCK_1;
-  NOP();
-  FIFO_RRST_0;
-  NOP();
-  FIFO_RCK_0;
-  NOP();
-  FIFO_RCK_1;
-  NOP();
   FIFO_RRST_1;
-  NOP();
-  FIFO_RCK_0;
-  NOP();
-  FIFO_RCK_1;
-  NOP();
-  }
 
+  FIFO_RRST_0;  
+  
+  FIFO_RCK_0;
+  FIFO_RCK_1;
+  FIFO_RCK_0;
+  FIFO_RCK_1;
+  FIFO_RCK_0;
+  
+  FIFO_RRST_1;
+  
+  FIFO_RCK_1;
+  }

@@ -1,5 +1,6 @@
 regval_list qvgayuv_regs[] = {
-{REG_CLKRC, 0x80},
+//{REG_CLKRC, 0x80},
+{REG_CLKRC, 0x01},
 {REG_COM11, 0x0A},
 {REG_TSLB, 0x04},
 {REG_HSTART, 0x16},
