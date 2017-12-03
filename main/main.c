@@ -297,6 +297,13 @@ static void http_server(void *pvParameters){
 
 
 static void wifiInitStation() {
+	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
+	tcpip_adapter_ip_info_t ipInfo;
+
+	inet_pton(AF_INET, "192.168.1.99", &ipInfo.ip); // no dhcp, use this static IP address
+	inet_pton(AF_INET, "192.168.1.1", &ipInfo.gw);
+	inet_pton(AF_INET, "255.255.255.0", &ipInfo.netmask);
+	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);		
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
     wifi_config_t sta_config = {
         .sta = {
@@ -311,21 +318,14 @@ static void wifiInitStation() {
 } 
 
 
-static void wifiInitAccessPoint() {
-	tcpip_adapter_ip_info_t ipInfo;
-
-	inet_pton(AF_INET, "192.168.4.1", &ipInfo.ip);
-	inet_pton(AF_INET, "192.168.4.1", &ipInfo.gw);
-	inet_pton(AF_INET, "255.255.255.0", &ipInfo.netmask);
-	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);	
-    
+static void wifiInitAccessPoint() {    
 	ESP_LOGD(TAG, "Starting access point ESP32Cam at 192.168.4.1...");
 	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
 	wifi_config_t apConfig = {
 		.ap = {
 			.ssid="ESP32Cam",
 			.ssid_len=0,
-			.password="klik",
+			.password="",
 			.channel=0,
 			.authmode=WIFI_AUTH_OPEN,
 			.ssid_hidden=0,
