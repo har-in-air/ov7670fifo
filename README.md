@@ -2,7 +2,7 @@
 
 Functions as a web server to periodically serve camera image frames from an OV7670 camera module with AL422 FIFO interfaced to an ESP32 module. 
 
-The esp32 first tries to initialize as a station connecting to an existing wifi network. If it succeeds, you can then open a web browser with the url specified as the IP address of the station (you will see the IP address assigned to the ESP32 in the console debug monitor). e.g. in my case it was  http://192.168.1.108
+The esp32 first tries to initialize as a station connecting to an existing wifi network. If it succeeds, you can then open a web browser with the url specified as the IP address of the station http://192.168.1.99
 
 When you connect, the server will transmit a javascript web page from the SPIFFS flash file system and your browser will execute it. The javascript code requests an image, the ESP32 responds by triggering a single camera frame capture to the on-board FIFO, and then reads out and transmits the binary data of the QVGA (320x240) YUV image. The javascript code translates the data into RGB pixels and paints an HTML canvas on your browser page. The whole process is repeated every few seconds to update the image.
 
